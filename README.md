@@ -1,0 +1,46 @@
+# Exercise
+
+Vote for pictures that exist in DropBox.
+
+# Get the code
+
+`git clone git://github.com/khalidr/VotingApp.git`
+
+# Configuration
+All configurations are in the `src/main/resources/application.conf` file.
+Here are the default settings.  Please note that the `dropBox.token` property is required.
+
+```
+votingApp{
+  host = localhost
+  port = 2212
+
+  db{
+    host = localhost
+    port = 27017
+    dbName = "myDB"
+  }
+
+  dropBox{
+    # Dropbox token. Required.
+    # token = ""
+    
+    # use to get the metadata for a file
+    metaDataUrl = "https://api.dropboxapi.com/1/metadata/auto/"
+    
+    #Url for saving file urls
+    uploadUrl = "https://api.dropboxapi.com/1/save_url/auto/"
+    
+    # Specify the DropBox folder
+    #folder = "foo"
+
+  }
+}
+```
+
+#Run it
+`> sbt run`
+
+#Run Tests
+`>sbt test`
+
