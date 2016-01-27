@@ -6,7 +6,7 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= {
   val sprayVersion = "1.3.3"
-  val akkaVersion = "2.3.14"
+  val akkaVersion = "2.4.1"
   val reactiveMongoVersion = "0.11.9"
 
   List(

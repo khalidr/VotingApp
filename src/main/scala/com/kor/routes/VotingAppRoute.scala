@@ -17,31 +17,30 @@ trait VotingAppRoute extends Directives with PlayJsonSupport with StrictLogging{
     path("event"){
       pathEndOrSingleSlash{
         post {
-          implicit val r = IncomingMessage.reads
           entity(as[IncomingMessage]) {
-            case TextMessage(msg) =>
-              onSuccess(sharingService.fileExists(msg)){exists =>
+            case TextMessage(picName) =>
+              onSuccess(sharingService.fileExists(picName)){ exists =>
                 exists.fold({
-                  onSuccess(addVote(repo, msg)) { _ =>
-                    complete(StatusCodes.OK)
+                  onSuccess(addVote(repo, picName)) { _ =>
+                    complete{
+                      logger.info(s"added vote for picture $picName")
+                      StatusCodes.OK}
                   }
                 }, {
-                  complete(StatusCodes.NotFound)
+                  complete(StatusCodes.NotFound, s"Picture $picName not found")
                 })
               }
             case MediaMessage(url) =>
               onSuccess(sharingService.upload(url)) { resp =>
                   complete(resp.status)
               }
-            case e:VoiceMessage => complete(StatusCodes.BadRequest, "Voice messages not handled.")
+            case _ => complete(StatusCodes.BadRequest, "Message not handled.")
           }
         }
       }
     } ~
-    path("report"){
-      get{
-        complete(repo.getAll)
-      }
+    path("report") {
+      complete(repo.getAll)
     }
 
   def addVote(repo:Repository, fileName:String)(implicit ec:ExecutionContext) = {
