@@ -1,6 +1,12 @@
 # Exercise
 
-Vote for pictures that exist in DropBox.
+- Create a way to upload images to DropBox.  The incoming message will be of the form: 
+    `{ "type": "inboundMedia", "payload": <Picture URL>, "fromNumber": "+12222222222", "toNumber": "+13333333333" }`
+- Create a way to vote for pictures that exist in DropBox.
+    `{ "type": "inboundText", "payload": <Picture URL>, "fromNumber": "+12222222222", "toNumber": "+13333333333" }`
+
+The following assumptions are made:
+1. Each person will only vote once.  We are not handling duplicate votes.
 
 # Get the code
 

@@ -5,21 +5,21 @@ import java.nio.file.Paths
 
 import akka.actor.ActorRefFactory
 import com.kor.domain.FileInfo
-import com.kor.services.FileSharingService.Response
+import com.kor.services.FileSharingService.UploadResult
 import com.typesafe.scalalogging.StrictLogging
 import spray.client.pipelining._
 import spray.http._
 import spray.httpx.PlayJsonSupport
 import spray.httpx.unmarshalling.FromResponseUnmarshaller
-
+import StatusCodes._
 import scala.concurrent.{ExecutionContext, Future}
 
 trait FileSharingService {
-  def upload(url:URL):Future[Response]
+  def upload(url:URL):Future[UploadResult]
   def fileExists(path:String):Future[Boolean]
 }
 object FileSharingService{
-  case class Response(status:StatusCode, reason:String)
+  case class UploadResult(status:StatusCode, reason:Option[String], picName:Option[String])
 }
 
 class DropBoxService(uploadUrl:URL, metaDataUrl:URL, token:String)(implicit actorRefFactory: ActorRefFactory, ec: ExecutionContext)
@@ -35,7 +35,10 @@ class DropBoxService(uploadUrl:URL, metaDataUrl:URL, token:String)(implicit acto
     val url = s"$uploadUrl$fileName"
     val entity = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"url=${encodedFileUrl.toString}")
 
-    pipeline(Post(s"${uploadUrl.toString}$fileName", entity)) map {r => Response(r.status, r.entity.asString)}
+    pipeline(Post(s"${uploadUrl.toString}$fileName", entity)) map {
+      case HttpResponse(OK, e, _, _) => UploadResult(OK, None, Some(fileName.toString))
+      case HttpResponse(s, e, _, _) => UploadResult(s, Some(e.asString), None)
+    }
   }
 
   private def encodeUrl(url:URL) = new URI(url.getProtocol, url.getUserInfo, url.getHost, url.getPort, url.getPath, url.getQuery, url.getRef).toURL

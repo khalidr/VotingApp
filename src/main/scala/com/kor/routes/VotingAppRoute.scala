@@ -32,7 +32,8 @@ trait VotingAppRoute extends Directives with PlayJsonSupport with StrictLogging{
               }
             case MediaMessage(url) =>
               onSuccess(sharingService.upload(url)) { resp =>
-                  complete(resp.status)
+                resp.picName foreach (p => logger.info(s"Uploaded $p"))
+                complete(resp.status)
               }
             case _ => complete(StatusCodes.BadRequest, "Message not handled.")
           }
