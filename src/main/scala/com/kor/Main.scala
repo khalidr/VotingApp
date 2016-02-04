@@ -29,7 +29,7 @@ object Main extends App with StrictLogging{
 
   sys.addShutdownHook {
     implicit val timeout = FiniteDuration(2, TimeUnit.SECONDS)
-    actorSystem.log.info("Shutting down")
+    logger.info("Shutting down")
     Await.result(mongoConnection.askClose(), Duration.Inf)
     logger.info("Mongo connection shutdown.")
 
